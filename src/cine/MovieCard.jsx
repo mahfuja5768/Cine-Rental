@@ -8,15 +8,31 @@ export default function MovieCard({ movie }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
 
-  const { cardData, setCardData } = useContext(MovieContext);
+  const { state, dispatch } = useContext(MovieContext);
+  console.log(state?.cardData);
 
-  function handleAddToCart(e, movie) {
-    e.stopPropagation();
-    const exits = cardData.find((item) => item.id === movie.id);
-    if (exits) {
-      alert("no no");
+  function handleAddToCart(event, movie) {
+    event.stopPropagation();
+
+    const found = state?.cartData?.find((item) => {
+      console.log(item);
+      return item.id === movie.id;
+    });
+
+    if (!found) {
+      dispatch({
+        type: "ADD_TO_CART",
+        payload: {
+          ...movie,
+        },
+      });
+      // toast.success(`Added  ${movie.title} to Cart !`, {
+      //     position: toast.POSITION.BOTTOM_RIGHT,
+      // });
     } else {
-      setCardData([...cardData, movie]);
+      // toast.error( `The movie ${movie.title} has been added to the cart already`, {
+      //     position: toast.POSITION.BOTTOM_RIGHT,
+      // });
     }
   }
 
@@ -24,7 +40,8 @@ export default function MovieCard({ movie }) {
     <>
       {showModal && (
         <MovieDetailsModal
-          movie={selectedMovie} onCartAdd={handleAddToCart}
+          movie={selectedMovie}
+          onCartAdd={handleAddToCart}
           onClose={() => {
             setSelectedMovie(null);
             setShowModal(false);
@@ -50,14 +67,14 @@ export default function MovieCard({ movie }) {
             <div className="flex items-center space-x-1 mb-5">
               <Rating value={movie.rating} />
             </div>
-            <a
+            <button
               onClick={(e) => handleAddToCart(e, movie)}
               className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
               href="#"
             >
               <img src="./assets/tag.svg" alt="" />
               <span>${movie.price} | Add to Cart</span>
-            </a>
+            </button>
           </figcaption>
         </a>
       </figure>
